@@ -1,0 +1,109 @@
+<script>
+	var editor = ace.edit("editor");
+	editor.setTheme("ace/theme/chrome");
+    editor.getSession().setMode("ace/mode/html");
+    editor.commands.addCommand({
+	    name: 'saveCommand',
+	    bindKey: {win: 'Ctrl-S',  mac: 'Command-S'},
+	    exec: function(editor) {
+	    	angular.element(document.getElementById('editor')).scope().saveNode();
+	    },
+	    readOnly: false // false if this command should not apply in readOnly mode
+	});
+</script>
+<style type="text/css">
+	#editor { position: relative; margin-top: 0px; height: 520px; }
+    #htmlViewer { 
+    	margin-top: 0px;
+    	font-family: "Monaco","Menlo","Ubuntu Mono","Consolas","source-code-pro",monospace;
+    	font-size: 14.5px; 
+    }
+	.ace-chrome .ace_gutter {
+		border-left: 2px dashed rgba(200,200,200,0.2);
+		background: none;
+	}
+	.ace-chrome {
+		font-size: 11pt; // -- not 'px', but 'pt' for high dpi screens
+	}
+
+    treecontrol.tree-classic li .tree-selected.c-labelSelected {background-color: #2F4F4F}
+    treecontrol.tree-classic li .tree-label.c-label {color: #ffffff}
+    a, a:focus,
+	a:hover {
+	  color: #20B2AA;
+	}
+	img {
+	   padding:1px;
+	   border:1px solid #021a40;
+	   background-color:#ff0;
+	   margin: 3px;
+	}
+ </style>
+
+<style type="text/css">
+.myTable{
+  margin:2px;
+}
+.myTable td {
+  padding:3px;
+  border:1px solid;
+}
+.myTable th {
+  padding:3px;
+  border:1px solid;
+}
+</style>
+<div ng-include="'components/navbar/navbar.html'" ng-show="isMenuOn"></div>
+
+<div class="docContainer">
+
+<!-- TOOL BAR -->
+<div class="row">
+	<!-- ====================== LEFT TOOLBAR ===================== -->
+	<div class="col-md-4" style="height:50px; padding-top:3px; padding-bottom:3px; padding-right:0px" align="right" valign="bottom" ng-show="isTreeOn">
+		<!-- Create new node -->
+		<input type="text" ng-model="newNodeName" placeholder="New node"  ng-show="selectedNode.type === 'folder'" />
+		
+			<button type="button" class="btn btn-default btn-xs" ng-click="createNode('folder')" ng-show="selectedNode.type === 'folder'">
+				<span class="glyphicon glyphicon-folder-close"></span></button>
+			<button type="button" class="btn btn-default btn-xs" ng-click="createNode('file')" ng-show="selectedNode.type === 'folder'"">
+				<span class="glyphicon glyphicon-file"></span></button>
+		
+		<!-- File Delete button -->
+		<button ng-show="selectedNode" type="button" class="btn btn-default btn-xs" ng-click="removeNode()">
+			<span class="glyphicon glyphicon-trash"></span>
+		</button>
+	</div>
+	<!-- ===================== RIGHT TOOLBAR ================ -->
+	<div ng-class="{'col-lg-offset-4': isTreeOn}" ng-include="'components/toolbar.html'" ng-controller="ToolbarCtrl" onload="loadMe(getCurrentScope())"></div>
+</div>
+
+<div class="row">
+	<!-- ==================== TREE =================== -->
+	<div class="col-lg-4" name="main" style="padding-right:0px">
+		<div class="box site-wrapper" ng-show="isTreeOn" style="margin-left:10px; margin-top:3px; padding-left:0px; ">
+			<treecontrol 
+				id="tree"
+				class="tree-classic " 
+				style="background-color:red"
+				tree-model="treedata" 
+				on-selection="selectNode(node)"
+				selected-node="selectedNode"
+				expanded-nodes="expandedNodes"
+				options="opts">{{node.name}}</treecontrol>
+		</div>
+	</div>
+
+	<!-- ==================== DOCUMENT ===================== -->
+	<div ng-class="{'col-lg-8': isTreeOn, 'col-lg-12': !isTreeOn}"  name="documant" ng-show="selectedNode.type === 'file'">
+			<div id="editor" class="box panel panel-default " style="margin-right:10px; margin-top:3px;" ng-show="isEditorOn" ></div>
+			<div id="htmlViewer" class="box panel panel-default _White" style="margin-right:10px; margin-top:3px;" ng-show="!isEditorOn" ></div>
+
+	</div>
+	<!-- ===================== RIGHT TOOLBAR ================ -->
+	<div ng-class="{'col-lg-offset-4': isTreeOn}" style="margin-top:-10px;" ng-if="showBottomToolbar()" ng-include="'components/toolbar.html'" ng-controller="ToolbarCtrl" onload="loadMe(getCurrentScope())"></div>
+</div><!-- //row -->
+
+
+
+</div>
